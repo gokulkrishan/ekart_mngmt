@@ -32,7 +32,7 @@ class Api::V1::CategoriesController < ApplicationController
     category = Category.find_by(id: params[:id])
     if category
       category.update(colour: params[:colour], price: params[:price], qty: params[:qty], product_id: params[:product_id])
-      render json: "category updated successfully", status: 200
+      render json: { message: "category updated successfully" }, status: 200
     else
       render json: {
         error: "category not found"
@@ -44,7 +44,7 @@ class Api::V1::CategoriesController < ApplicationController
     category = Category.find_by(id: params[:id])
     if category
       category.destroy
-      render json: "category has been deleted", status: 200
+      render json: { message: "category has been deleted" }, status: 200
     else
       render json: {
         error: "category not found"

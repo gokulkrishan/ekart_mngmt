@@ -2,6 +2,8 @@
 
 one:
   prd_type: MyString
+  style_name: MyString
 
 two:
   prd_type: MyString
+  style_name: MyString

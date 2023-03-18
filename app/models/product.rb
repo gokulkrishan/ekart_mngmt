@@ -1,5 +1,7 @@
 class Product < ApplicationRecord
     has_many :categories
 
-    validates :style_name, length: { minimum: 2}, presence: true, uniqueness: true
+    attribute :style_name, :string
+
+    validates :style_name, length: { minimum: 3}, presence: true, uniqueness: true
 end

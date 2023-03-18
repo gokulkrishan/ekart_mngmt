@@ -47,7 +47,7 @@ class CategoriesTest < ActionDispatch::IntegrationTest
       assert_equal "black", response.parsed_body["colour"]
       assert_equal 45000, response.parsed_body["price"]
       assert_equal 5, response.parsed_body["qty"]
-     
+
     # update a category
       category.update(colour: "black,blue")
       put api_v1_category_url(category), params: { token: token }
@@ -64,36 +64,42 @@ class CategoriesTest < ActionDispatch::IntegrationTest
 
   test "using invalid token" do
     # Create a new user
-    post api_v1_users_url, params: { user: { name: "Ajith", email: "ajith1@gmail.com", password: "Ajith@12"} }
-    assert_response :success
-    user = JSON.parse(response.body)
-    assert_equal "Ajith",response.parsed_body["name"]
-    assert_equal "ajith1@gmail.com",response.parsed_body["email"]
+      post api_v1_users_url, params: { user: { name: "Ajith", email: "ajith1@gmail.com", password: "Ajith@12"} }
+      assert_response :success
+      user = JSON.parse(response.body)
+      assert_equal "Ajith",response.parsed_body["name"]
+      assert_equal "ajith1@gmail.com",response.parsed_body["email"]
 
-  # Log in user and generate token
-    post api_v1_login_url, params: { email: "ajith1@gmail.com", password: "Ajith@12" }
-    assert_response :success
-    response_body = JSON.parse(response.body)
-    token = response_body['token']
-    expire_at = Time.now - 1.hour
-    user = User.find_by(email: "ajith1@gmail.com")
-    user.update(expire_at: Time.now - 1.hour)
-    user.update(token: token, expire_at: expire_at)
-    puts expire_at
-  # index api with invalid token
-    #invalid_token = "invalid_token123"
-    get api_v1_categories_url, params: { token: token}
-    assert_response :unauthorized
-    category =JSON.parse(response.body)
-    puts response.body
-    #assert_equal "Session expired. please login again", response_body['message']
-  
-  # index api without token
-    # get api_v1_categories_url
-    # assert_response :unauthorized
-    # response_body = JSON.parse(response.body)
-    # assert_equal "Please login  ", response_body["error"]
+    # Log in user and generate token
+      post api_v1_login_url, params: { email: "ajith1@gmail.com", password: "Ajith@12" }
+      assert_response :success
+      response_body = JSON.parse(response.body)
+      token = response_body['token']
+      expire_at = Time.now + 1.hour
+      user.update(token: token, expire_at: expire_at)
 
+    # index api with invalid token
+      invalid_token = "invalid_token123"
+      get api_v1_categories_url, params: { token: invalid_token}
+      assert_response :unauthorized
+      category =JSON.parse(response.body)
+    
+    # index api without token
+      get api_v1_categories_url
+      assert_response :unauthorized
+      response_body = JSON.parse(response.body)
+      assert_equal "Please login", response_body["error"]
+
+    # login with invalid email
+      post api_v1_login_url, params: { email: "ajith@gmail.com", password: "Ajith@12" }
+      assert_response :unauthorized
+      login =JSON.parse(response.body)
+      assert_equal "Invalid email or password",response.parsed_body["error"]
+
+     # login with invalid password
+      post api_v1_login_url, params: { email: "ajith1@gmail.com", password: "Ajit@12" }
+      assert_response :unauthorized
+      login =JSON.parse(response.body)
+      assert_equal "Invalid email or password",response.parsed_body["error"]   
   end
-
 end
